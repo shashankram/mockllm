@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mockllm
+  labels:
+    app.kubernetes.io/name: mockllm
+spec:
+  ports:
+    - name: http
+      port: 9000
+  selector:
+    app.kubernetes.io/name: mockllm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mockllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mockllm
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mockllm
+    spec:
+      containers:
+      - image: docker.io/shashankram/mockllm:latest
+        imagePullPolicy: IfNotPresent
+        name: mockllm
+        ports:
+        - containerPort: 9000
+        env:
+        - name: SERVER_PORT
+          value: "9000"
+        - name: MOCKLLM_RESPONSES_FILE
+          value: /etc/mockllm/responses.yaml
+        volumeMounts:
+        - name: responses
+          mountPath: /etc/mockllm
+          readOnly: true
+      volumes:
+      - name: responses
+        configMap:
+          name: mockllm-responses
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: mockllm-responses
+data:
+  responses.yaml: |
+    responses:
+      "what colour is the sky?": "The sky is blue during a clear day due to a phenomenon called Rayleigh scattering."
+      "who is the president?": "This is a mock response. In a production environment, this would be replaced with accurate, up-to-date information."
+      "tell me a joke": "Why don't programmers like nature? It has too many bugs!"
+      "what is the meaning of life?": "According to this mock response, the meaning of life is to write better mock servers."
+
+    defaults:
+      unknown_response: "I don't know the answer to that. This is a mock response."
+
+    settings:
+      lag_enabled: true
+      lag_factor: 10  # Higher values = faster responses (10 = fast, 1 = slow)  
+

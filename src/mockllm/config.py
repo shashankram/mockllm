@@ -20,7 +20,9 @@ class ResponseConfig:
 
     def __init__(self, yaml_path: Optional[str] = None):
         self.yaml_path = cast(
-            str, yaml_path or os.getenv("MOCKLLM_RESPONSES_FILE", "responses.yml")
+            str,
+            yaml_path
+            or os.getenv("MOCKLLM_RESPONSES_FILE", "/etc/mockllm/responses.yaml"),
         )
         self.last_modified = 0
         self.responses: Dict[str, str] = {}

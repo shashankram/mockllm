@@ -46,6 +46,11 @@ clean:
 build: clean
 	poetry build
 
+IMG_TAG ?= latest
+IMG_REPO ?= mockllm
+docker-build:
+	docker buildx build -t $(IMG_REPO):$(IMG_TAG) .
+
 # Install package locally
 install:
 	poetry install
@@ -76,6 +81,7 @@ help:
 	@echo "  type-check   : Run mypy type checker"
 	@echo "  clean        : Clean up build artifacts"
 	@echo "  build        : Build package"
+	@echo "  docker-build : Build Docker image"
 	@echo "  install      : Install package with Poetry"
 	@echo "  install-dev  : Install package with development dependencies"
 	@echo "  requirements : Export requirements.txt files"
