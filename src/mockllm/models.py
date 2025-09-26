@@ -1,8 +1,22 @@
 import time
 import uuid
-from typing import Dict, List, Literal, Optional
+from typing import Dict, Iterable, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
+
+from anthropic.types.content_block import ContentBlock
+from anthropic.types.text_block_param import TextBlockParam
+from anthropic.types.image_block_param import ImageBlockParam
+from anthropic.types.document_block_param import DocumentBlockParam
+from anthropic.types.thinking_block_param import ThinkingBlockParam
+from anthropic.types.tool_use_block_param import ToolUseBlockParam
+from anthropic.types.tool_result_block_param import ToolResultBlockParam
+from anthropic.types.search_result_block_param import SearchResultBlockParam
+from anthropic.types.server_tool_use_block_param import ServerToolUseBlockParam
+from anthropic.types.redacted_thinking_block_param import RedactedThinkingBlockParam
+from anthropic.types.web_search_tool_result_block_param import (
+    WebSearchToolResultBlockParam,
+)
 
 
 # OpenAI Models
@@ -72,7 +86,24 @@ class AnthropicMessage(BaseModel):
     """Anthropic message model."""
 
     role: Literal["user", "assistant"]
-    content: str
+    content: Union[
+        str,
+        Iterable[
+            Union[
+                TextBlockParam,
+                ImageBlockParam,
+                DocumentBlockParam,
+                SearchResultBlockParam,
+                ThinkingBlockParam,
+                RedactedThinkingBlockParam,
+                ToolUseBlockParam,
+                ToolResultBlockParam,
+                ServerToolUseBlockParam,
+                WebSearchToolResultBlockParam,
+                ContentBlock,
+            ]
+        ],
+    ]
 
 
 class AnthropicChatRequest(BaseModel):

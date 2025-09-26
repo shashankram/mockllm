@@ -34,6 +34,7 @@ watchdog = ">=2.1.0"
 httpx = "^0.28.1"
 tiktoken = "^0.9.0"
 click = "^8.1.0"
+anthropic = "0.68.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=6.0"

@@ -43,14 +43,16 @@ class AnthropicProvider(LLMProvider):
                 status_code=400, detail="No user message found in request"
             )
 
+        content_text = self.extract_text_content(last_message.content)
+
         if request.stream:
             return StreamingResponse(
-                self.generate_stream_response(last_message.content, request.model),
+                self.generate_stream_response(content_text, request.model),
                 media_type="text/event-stream",
             )
 
         response_content = await self.response_config.get_response_with_lag(
-            last_message.content
+            content_text
         )
 
         prompt_tokens = count_tokens(str(request.messages), request.model)
@@ -66,3 +68,18 @@ class AnthropicProvider(LLMProvider):
                 "total_tokens": total_tokens,
             },
         ).model_dump()
+
+    def extract_text_content(self, content) -> str:
+        """Extract text content from Union type content."""
+        if isinstance(content, str):
+            return content
+
+        # Handle iterable of content blocks
+        text_parts = []
+        for block in content:
+            if hasattr(block, "text"):
+                text_parts.append(block.text)
+            elif isinstance(block, dict) and "text" in block:
+                text_parts.append(block["text"])
+
+        return " ".join(text_parts)
